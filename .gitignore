@@ -1,0 +1,31 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# env (klíče nikdy necommittovat)
+.env
+.env*.local
+
+# Next.js
+.next/
+out/
+
+# production
+build
+dist
+
+# misc
+.DS_Store
+*.pem
+debug.log
+npm-debug.log*
+
+# IDE
+.idea
+.vscode
+
+# Vercel
+.vercel
+
+# TypeScript (next-env.d.ts se commituje)
