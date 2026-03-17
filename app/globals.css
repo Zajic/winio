@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Blok 18.1: jednotné CTA a responzivní kontejner */
+:root {
+  --color-cta-bg: theme("colors.gray.800");
+  --color-cta-hover: theme("colors.gray.700");
+  --color-cta-text: theme("colors.white");
+}

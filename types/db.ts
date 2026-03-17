@@ -71,3 +71,74 @@ export type Kasino = {
   created_at: string;
   updated_at: string;
 };
+
+export type TypClanku = "news" | "blog" | "pr_placeny";
+
+export type Clanky = {
+  id: string;
+  typ: TypClanku;
+  titul: string;
+  slug: string;
+  perex: string | null;
+  telo: string | null;
+  zdroj_url: string | null;
+  zdroj_nazev: string | null;
+  affiliate_cta_kasino_id: string | null;
+  affiliate_cta_sazkovka_id: string | null;
+  je_placena_spoluprace: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TypMista = "pobocka_sazkovky" | "kasino";
+
+export type Misto = {
+  id: string;
+  typ: TypMista;
+  nazev: string;
+  adresa: string | null;
+  lat: number | null;
+  lng: number | null;
+  sazkovka_id: string | null;
+  kasino_id: string | null;
+  external_id: string | null;
+  oteviraci_doba: unknown;
+  zdroj: string | null;
+  aktivni: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PoradnaKategorie = "faq" | "adiktologie" | "pomoc";
+
+export type Poradna = {
+  id: string;
+  slug: string;
+  titul: string;
+  telo: string | null;
+  kategorie: PoradnaKategorie;
+  razeni: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type UserPreferences = {
+  user_id: string;
+  oblíbene_tymy: string[];
+  oblíbene_ligy: string[];
+  souhlas_newsletter: boolean;
+  souhlas_pripominky: boolean;
+  sazkovky_ids: string[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type Pripominka = {
+  id: string;
+  user_id: string;
+  zapas_id: string;
+  odeslat_v: string;
+  odeslano: boolean;
+  created_at: string;
+};

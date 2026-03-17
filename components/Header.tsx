@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 
-export function Header() {
+export async function Header() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <header className="border-b">
       <div className="container mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
@@ -31,6 +35,34 @@ export function Header() {
           <Link href="/clanky" className="text-sm hover:underline">
             Články
           </Link>
+          <Link href="/mapa" className="text-sm hover:underline">
+            Mapa
+          </Link>
+          <Link href="/safe-play" className="text-sm hover:underline">
+            Safe Play
+          </Link>
+          <Link href="/poradna" className="text-sm hover:underline">
+            Poradna
+          </Link>
+          {user ? (
+            <>
+              <Link href="/ucet" className="text-sm hover:underline">
+                Můj účet
+              </Link>
+              <Link href="/odhlaseni" className="text-sm hover:underline">
+                Odhlásit
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/prihlaseni" className="text-sm hover:underline">
+                Přihlásit
+              </Link>
+              <Link href="/registrace" className="text-sm hover:underline">
+                Registrace
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>

@@ -18,6 +18,24 @@ type OddsApiEvent = {
   }[];
 };
 
+type ScoresApiEvent = {
+  id: string;
+  sport_key: string;
+  commence_time: string;
+  home_team: string;
+  away_team: string;
+  completed: boolean;
+  scores: Array<{ name: string; score: string }> | null;
+};
+
+function formatVysledek(ev: ScoresApiEvent): string {
+  if (!ev.scores || ev.scores.length < 2) return "";
+  const home = ev.scores.find((s) => s.name === ev.home_team)?.score;
+  const away = ev.scores.find((s) => s.name === ev.away_team)?.score;
+  if (home != null && away != null) return `${home} : ${away}`;
+  return ev.scores.map((s) => s.score).join(" : ");
+}
+
 function isAuthorized(request: Request): boolean {
   const authHeader = request.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
@@ -145,10 +163,34 @@ export async function GET(request: Request) {
       }
     }
 
+    // Blok 9: načíst výsledky ukončených zápasů (Scores API, daysFrom=1)
+    let totalVysledky = 0;
+    for (const sportKey of sports) {
+      const scoresUrl = `${ODDS_API_BASE}/sports/${sportKey}/scores?daysFrom=1&apiKey=${apiKey}`;
+      const scoresRes = await fetch(scoresUrl);
+      if (!scoresRes.ok) continue; // některé sporty scores nemají
+      const scoreEvents: ScoresApiEvent[] = await scoresRes.json();
+      for (const ev of scoreEvents) {
+        if (!ev.completed || !ev.scores?.length) continue;
+        const vysledek = formatVysledek(ev);
+        if (!vysledek) continue;
+        const { error: updErr } = await supabase
+          .from("zapasy")
+          .update({
+            stav: "ukonceny",
+            vysledek,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("external_id", ev.id);
+        if (!updErr) totalVysledky++;
+      }
+    }
+
     return NextResponse.json({
       ok: true,
       zapasy: totalZapasy,
       kurzy: totalKurzy,
+      vysledky: totalVysledky,
     });
   } catch (e) {
     console.error("Cron odds error:", e);

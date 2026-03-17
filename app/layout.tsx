@@ -3,6 +3,7 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CookieBar } from "@/components/CookieBar";
+import { Analytics } from "@/components/Analytics";
 
 export const metadata: Metadata = {
   title: "Winio – informace o sázkách a kurzech",
@@ -22,6 +23,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
         <CookieBar />
+        <Analytics />
       </body>
     </html>
   );

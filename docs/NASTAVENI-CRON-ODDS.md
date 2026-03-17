@@ -48,7 +48,10 @@ Bez nastaveného `external_id` u sázkovky se pro ni kurzy neukládají.
   `GET https://<tvuj-projekt>.vercel.app/api/cron/odds`  
   s hlavičkou: `Authorization: Bearer <tvuj CRON_SECRET>`.
 
-Po úspěšném běhu se naplní tabulky `zapasy` a `kurzy`; na `/zapasy` a na homepage se zobrazí zápasy.
+Po úspěšném běhu se naplní tabulky `zapasy` a `kurzy`; na `/zapasy` a na homepage se zobrazí zápasy. Cron také volá **Scores API** (`daysFrom=1`) a u ukončených zápasů nastaví `stav = ukonceny` a `vysledek` (skóre).
+
+**Ruční nastavení výsledku:**  
+`PATCH /api/admin/zapasy/{id}` s hlavičkou `Authorization: Bearer <CRON_SECRET>` a tělem JSON: `{ "stav": "ukonceny", "vysledek": "2 : 1" }`. Hodí se, když Odds API výsledek nemá.
 
 ---
 

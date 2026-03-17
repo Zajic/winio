@@ -81,6 +81,8 @@ export default async function BonusyPage() {
                         href={s.affiliate_url_registrace}
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-cta="registrace_bonusy"
+                        data-cta-label={s.nazev}
                         className="inline-block rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-xs text-white hover:bg-gray-700"
                       >
                         Vsadit / Registrovat

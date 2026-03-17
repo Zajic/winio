@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { JsonLd } from "@/components/JsonLd";
+import { ShareButtons } from "@/components/ShareButtons";
 import type { Sazkovka } from "@/types/db";
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://winio.cz";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -39,8 +43,17 @@ export default async function SazkovkaDetailPage({ params }: Props) {
   if (error || !data) notFound();
   const s = data as Sazkovka;
 
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: s.nazev,
+    description: s.popis ?? undefined,
+    url: `${BASE_URL}/sazkovky/${s.slug}`,
+  };
+
   return (
     <article className="container mx-auto px-4 py-8 max-w-3xl">
+      <JsonLd data={orgJsonLd} />
       <nav className="text-sm text-gray-600 mb-4">
         <Link href="/sazkovky" className="hover:underline">
           Sázkové kanceláře
@@ -61,6 +74,8 @@ export default async function SazkovkaDetailPage({ params }: Props) {
             href={s.affiliate_url_registrace}
             target="_blank"
             rel="noopener noreferrer"
+            data-cta="registrace_sazkovka"
+            data-cta-label={s.nazev}
             className="inline-block rounded border border-gray-700 bg-gray-800 px-5 py-2.5 text-white hover:bg-gray-700"
           >
             Vsadit / Registrovat u {s.nazev}
@@ -74,6 +89,9 @@ export default async function SazkovkaDetailPage({ params }: Props) {
             .
           </p>
         )}
+      </div>
+      <div className="mt-6 pt-4 border-t">
+        <ShareButtons title={`${s.nazev} | Sázkové kanceláře | Winio`} url={`${BASE_URL}/sazkovky/${s.slug}`} />
       </div>
     </article>
   );

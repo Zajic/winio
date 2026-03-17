@@ -3,6 +3,18 @@
     {
       "path": "/api/cron/odds",
       "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/seo-preview",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/rss",
+      "schedule": "0 */6 * * *"
+    },
+    {
+      "path": "/api/cron/pobocky",
+      "schedule": "0 0 1 * *"
     }
   ]
 }

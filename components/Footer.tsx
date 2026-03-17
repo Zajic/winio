@@ -18,6 +18,9 @@ export function Footer() {
           <Link href="/safe-play" className="hover:underline">
             Safe Play
           </Link>
+          <Link href="/poradna" className="hover:underline">
+            Poradna
+          </Link>
           <Link href="/o-nas" className="hover:underline">
             O nás
           </Link>

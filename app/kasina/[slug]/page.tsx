@@ -62,6 +62,8 @@ export default async function KasinoDetailPage({ params }: Props) {
             href={k.affiliate_url}
             target="_blank"
             rel="noopener noreferrer"
+            data-cta="registrace_kasino"
+            data-cta-label={k.nazev}
             className="inline-block rounded border border-gray-700 bg-gray-800 px-5 py-2.5 text-white hover:bg-gray-700"
           >
             Zahrát u {k.nazev}
