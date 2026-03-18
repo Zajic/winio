@@ -7,10 +7,10 @@ export const metadata: Metadata = {
   description: "Přihlaste se ke svému účtu.",
 };
 
-type Props = { searchParams: Promise<{ registered?: string }> };
+type Props = { searchParams: Promise<{ registered?: string; redirect?: string }> };
 
 export default async function PrihlaseniPage({ searchParams }: Props) {
-  const { registered } = await searchParams;
+  const { registered, redirect: redirectTo } = await searchParams;
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-md">
@@ -22,7 +22,7 @@ export default async function PrihlaseniPage({ searchParams }: Props) {
         </p>
       )}
       <p className="text-gray-600 mb-6">Zadejte e-mail a heslo.</p>
-      <PrihlaseniForm />
+      <PrihlaseniForm redirectTo={redirectTo ?? ""} />
       <p className="mt-4 text-sm text-gray-600">
         Nemáte účet?{" "}
         <Link href="/registrace" className="underline">

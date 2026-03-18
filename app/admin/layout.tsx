@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminEmail } from "@/lib/admin";
 import { AdminNav } from "./_components/AdminNav";
@@ -17,7 +16,22 @@ export default async function AdminLayout({
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/prihlaseni?redirect=/admin");
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="bg-white border rounded-lg p-8 max-w-md text-center">
+          <h1 className="text-xl font-semibold text-gray-800 mb-2">Přihlášení nutné</h1>
+          <p className="text-gray-600 mb-6">
+            Pro vstup do administrace se musíte přihlásit. Po přihlášení budete přesměrováni zpět na admin.
+          </p>
+          <Link
+            href="/prihlaseni?redirect=/admin"
+            className="inline-block rounded bg-gray-800 text-white px-5 py-2.5 text-sm font-medium hover:bg-gray-700"
+          >
+            Přejít na přihlášení
+          </Link>
+        </div>
+      </div>
+    );
   }
 
   if (!isAdminEmail(user.email)) {

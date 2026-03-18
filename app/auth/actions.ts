@@ -30,7 +30,8 @@ export async function signUp(formData: FormData) {
   }
 }
 
-export async function signIn(formData: FormData) {
+/** Vrací cílovou URL po přihlášení; klient provede přesměrování (bez redirect() z action). */
+export async function signIn(formData: FormData): Promise<{ error?: string; redirectTo?: string }> {
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   if (!email || !password) {
@@ -40,7 +41,10 @@ export async function signIn(formData: FormData) {
     const supabase = await createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return { error: error.message };
-    redirect("/ucet");
+    const to = (formData.get("redirect") as string)?.trim();
+    const redirectTo =
+      to && to.startsWith("/") && !to.startsWith("//") ? to : "/ucet";
+    return { redirectTo };
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (msg.includes("fetch") || msg.includes("network") || msg.includes("ECONNREFUSED")) {

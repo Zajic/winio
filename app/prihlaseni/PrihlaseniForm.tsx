@@ -1,17 +1,29 @@
 "use client";
 
 import { useActionState } from "react";
+import { useRouter } from "next/navigation";
 import { signIn } from "@/app/auth/actions";
 
-export function PrihlaseniForm() {
+type Props = { redirectTo?: string };
+
+export function PrihlaseniForm({ redirectTo = "" }: Props) {
+  const router = useRouter();
+
   const [state, formAction, isPending] = useActionState(
-    async (_state: { error: string } | null, formData: FormData) => {
+    async (_state: { error?: string; redirectTo?: string } | null, formData: FormData) => {
+      if (redirectTo) formData.set("redirect", redirectTo);
       const result = await signIn(formData);
       if (result?.error) return { error: result.error };
+      if (result?.redirectTo) return { redirectTo: result.redirectTo };
       return null;
     },
     null
   );
+
+  if (state?.redirectTo) {
+    router.replace(state.redirectTo);
+    return <p className="text-sm text-gray-600">Přesměrování…</p>;
+  }
 
   return (
     <form action={formAction} className="space-y-4">
