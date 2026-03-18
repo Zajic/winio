@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { BannerSlot } from "@/components/BannerSlot";
 import type { Zapas } from "@/types/db";
 
 const SPORT_LABELS: Record<string, string> = {
@@ -53,6 +54,9 @@ export default async function HomePage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="mb-6">
+        <BannerSlot pozice="homepage_top" />
+      </div>
       <h1 className="text-2xl font-semibold mb-6">Winio</h1>
       <p className="mb-8">
         Informační web o sázkách, kurzech a licencovaných operátorech. Obsah

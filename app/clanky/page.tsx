@@ -23,7 +23,7 @@ export default async function ClankyPage({ searchParams }: Props) {
 
   let query = supabase
     .from("clanky")
-    .select("id, typ, titul, slug, perex, published_at")
+    .select("id, typ, titul, slug, perex, published_at, zdroj_url")
     .not("published_at", "is", null)
     .lte("published_at", new Date().toISOString())
     .order("published_at", { ascending: false })
@@ -44,7 +44,10 @@ export default async function ClankyPage({ searchParams }: Props) {
     );
   }
 
-  const clanky = (rows ?? []) as Pick<Clanky, "id" | "typ" | "titul" | "slug" | "perex" | "published_at">[];
+  const clanky = (rows ?? []) as Pick<
+    Clanky,
+    "id" | "typ" | "titul" | "slug" | "perex" | "published_at" | "zdroj_url"
+  >[];
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -83,7 +86,16 @@ export default async function ClankyPage({ searchParams }: Props) {
           clanky.map((c) => (
             <li key={c.id} className="border-b border-gray-200 pb-4">
               <Link href={`/clanky/${c.slug}`} className="block hover:opacity-90">
-                <span className="text-xs text-gray-500">{TYP_LABELS[c.typ] ?? c.typ}</span>
+                <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                  <span className="text-xs text-gray-500">
+                    {TYP_LABELS[c.typ] ?? c.typ}
+                  </span>
+                  {c.typ === "news" && c.zdroj_url && (
+                    <span className="text-xs rounded bg-slate-100 text-slate-700 px-1.5 py-0.5">
+                      výňatek + odkaz na zdroj
+                    </span>
+                  )}
+                </div>
                 <h2 className="font-medium text-lg">{c.titul}</h2>
                 {c.perex && (
                   <p className="text-sm text-gray-600 mt-1 line-clamp-2">{c.perex}</p>

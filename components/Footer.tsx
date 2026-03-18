@@ -21,8 +21,14 @@ export function Footer() {
           <Link href="/poradna" className="hover:underline">
             Poradna
           </Link>
+          <Link href="/loterie" className="hover:underline">
+            Loterie
+          </Link>
           <Link href="/o-nas" className="hover:underline">
             O nás
+          </Link>
+          <Link href="/admin" className="hover:underline text-gray-400">
+            Administrace
           </Link>
         </nav>
       </div>

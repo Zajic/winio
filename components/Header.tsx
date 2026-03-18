@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { isAdminEmail } from "@/lib/admin";
 
 export async function Header() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const isAdmin = user ? isAdminEmail(user.email) : false;
 
   return (
     <header className="border-b">
@@ -26,6 +28,9 @@ export async function Header() {
           <Link href="/hry" className="text-sm hover:underline">
             Hry
           </Link>
+          <Link href="/loterie" className="text-sm hover:underline">
+            Loterie
+          </Link>
           <Link href="/bonusy" className="text-sm hover:underline">
             Bonusy
           </Link>
@@ -46,6 +51,11 @@ export async function Header() {
           </Link>
           {user ? (
             <>
+              {isAdmin && (
+                <Link href="/admin" className="text-sm hover:underline text-amber-600">
+                  Administrace
+                </Link>
+              )}
               <Link href="/ucet" className="text-sm hover:underline">
                 Můj účet
               </Link>

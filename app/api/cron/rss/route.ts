@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createHash } from "crypto";
+import { parseRssItems } from "@/lib/rss-import";
 
 function isAuthorized(request: Request): boolean {
   const authHeader = request.headers.get("authorization");
@@ -18,26 +19,6 @@ function slugify(text: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-|-$/g, "")
     .slice(0, 50);
-}
-
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 500);
-}
-
-function parseRssItems(xml: string): Array<{ title: string; link: string; pubDate: string | null; description: string }> {
-  const items: Array<{ title: string; link: string; pubDate: string | null; description: string }> = [];
-  const itemRegex = /<item[^>]*>([\s\S]*?)<\/item>/gi;
-  let m;
-  while ((m = itemRegex.exec(xml)) !== null) {
-    const block = m[1];
-    const title = block.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.replace(/<[^>]+>/g, "").trim() ?? "";
-    const link = block.match(/<link[^>]*>([\s\S]*?)<\/link>/i)?.[1]?.trim() ?? block.match(/<link[^>]*href="([^"]+)"/i)?.[1] ?? "";
-    const pubDate = block.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i)?.[1]?.trim() ?? null;
-    const desc = block.match(/<description[^>]*>([\s\S]*?)<\/description>/i)?.[1] ?? "";
-    const description = stripHtml(desc);
-    if (title && link) items.push({ title, link, pubDate, description });
-  }
-  return items;
 }
 
 export async function GET(request: Request) {
@@ -92,10 +73,10 @@ export async function GET(request: Request) {
 
         const publishedAt = it.pubDate ? new Date(it.pubDate).toISOString() : now;
         const row = {
-          typ: "news",
+          typ: "news" as const,
           titul: it.title.slice(0, 500),
           slug,
-          perex: it.description || null,
+          perex: it.description,
           telo: null,
           zdroj_url: it.link,
           zdroj_nazev: zdrojNazev,

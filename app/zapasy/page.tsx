@@ -13,6 +13,9 @@ const SPORT_LABELS: Record<string, string> = {
   fotbal: "Fotbal",
   hokej: "Hokej",
   mma: "MMA",
+  basketbal: "Basketbal",
+  tenis: "Tenis",
+  esport: "eSport",
 };
 
 type Props = { searchParams: Promise<{ sport?: string; den?: string }> };
@@ -99,7 +102,7 @@ export default async function ZapasyPage({ searchParams }: Props) {
         >
           Vše
         </Link>
-        {["fotbal", "hokej", "mma"].map((s) => (
+        {(["fotbal", "hokej", "mma", "basketbal", "tenis", "esport"] as const).map((s) => (
           <Link
             key={s}
             href={`/zapasy?sport=${s}${denFilter ? `&den=${denFilter}` : ""}`}

@@ -67,10 +67,16 @@ export async function GET(request: Request) {
     );
   }
 
+  // Klíče z https://api.the-odds-api.com/v4/sports/?apiKey=… (in-season sporty).
+  // Fotbal: víc lig = víc zápasů. MMA: mma_mixed_martial_arts (UFC apod.).
   const sports =
-    process.env.ODDS_API_SPORTS?.split(",").map((s) => s.trim()) ?? [
-      "soccer_eurocup",
+    process.env.ODDS_API_SPORTS?.split(",").map((s) => s.trim()).filter(Boolean) ?? [
       "icehockey_nhl",
+      "soccer_epl",
+      "soccer_germany_bundesliga",
+      "soccer_spain_la_liga",
+      "soccer_uefa_champs_league",
+      "mma_mixed_martial_arts",
     ];
 
   try {
@@ -106,9 +112,15 @@ export async function GET(request: Request) {
           ? "fotbal"
           : sportKey.startsWith("icehockey")
             ? "hokej"
-            : sportKey.startsWith("mma")
-              ? "mma"
-              : sportKey;
+            : sportKey.startsWith("basketball")
+              ? "basketbal"
+              : sportKey.startsWith("tennis")
+                ? "tenis"
+                : sportKey.startsWith("esports")
+                  ? "esport"
+                  : sportKey.startsWith("mma")
+                    ? "mma"
+                    : sportKey;
 
       for (const ev of events) {
         const { data: zapasRow, error: errZapas } = await supabase

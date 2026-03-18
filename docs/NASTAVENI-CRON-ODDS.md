@@ -15,7 +15,7 @@ V projektu na Vercel: **Settings → Environment Variables**. Přidej:
 | `SUPABASE_SERVICE_ROLE_KEY` | ano | Supabase Dashboard → Project Settings → API → **service_role** (secret). Pouze pro cron (zápis do `zapasy`, `kurzy`). |
 | `ODDS_API_KEY` | ano | Klíč z [The Odds API](https://the-odds-api.com/). |
 | `CRON_SECRET` | ano | Libovolný tajný řetězec (např. vygenerovaný). Používá se pro volání `/api/cron/odds` (např. `Authorization: Bearer <CRON_SECRET>`). |
-| `ODDS_API_SPORTS` | ne | Sporty z API, čárkou oddělené. Výchozí: `soccer_eurocup`, `icehockey_nhl`. Např. `soccer_eurocup,icehockey_nhl,mma_ufc` |
+| `ODDS_API_SPORTS` | ne | Klíče sportů z `GET /v4/sports/`, čárkou. **Pokud máš jen hokej**, pravděpodobně máš v env jen `icehockey_nhl` – přidej fotbal a MMA, např. `icehockey_nhl,soccer_epl,soccer_germany_bundesliga,soccer_uefa_champs_league,mma_mixed_martial_arts`. **Nebo proměnnou smaž** – použije se výchozí seznam v kódu (NHL + EPL, Bundesliga, La Liga, LM + MMA). |
 
 Po přidání proměnných znovu nasaď projekt (redeploy).
 

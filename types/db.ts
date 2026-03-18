@@ -142,3 +142,60 @@ export type Pripominka = {
   odeslano: boolean;
   created_at: string;
 };
+
+export type TypBanneru = "reklama" | "vlastni";
+
+export type PoziceBanneru = "homepage_top" | "homepage_sidebar" | "clanek_bottom" | "sidebar_global";
+
+export type Banner = {
+  id: string;
+  nazev: string;
+  typ: TypBanneru;
+  obrazek_url: string;
+  odkaz_url: string | null;
+  pozice: PoziceBanneru;
+  aktivni: boolean;
+  poradi: number;
+  platnost_od: string | null;
+  platnost_do: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type TypLoterieProduktu = "cislovana" | "stiraci" | "jine";
+
+export type LoterieOperator = {
+  id: string;
+  nazev: string;
+  slug: string;
+  popis: string | null;
+  licence: string | null;
+  logo_url: string | null;
+  web_url: string | null;
+  aktivni: boolean;
+  poradi: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type LoterieProdukt = {
+  id: string;
+  operator_id: string;
+  nazev: string;
+  slug: string;
+  popis: string | null;
+  typ: TypLoterieProduktu;
+  oficialni_vysledky_url: string | null;
+  aktivni: boolean;
+  poradi: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type LoterieTah = {
+  id: string;
+  produkt_id: string;
+  datum_losovani: string;
+  vysledek_text: string;
+  created_at: string;
+};

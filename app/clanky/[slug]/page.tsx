@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { BannerSlot } from "@/components/BannerSlot";
 import { JsonLd } from "@/components/JsonLd";
 import { ShareButtons } from "@/components/ShareButtons";
 import type { Clanky, Sazkovka, Kasino } from "@/types/db";
@@ -15,16 +16,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("clanky")
-    .select("titul, perex")
+    .select("titul, perex, typ, zdroj_url")
     .eq("slug", slug)
     .not("published_at", "is", null)
     .single();
 
   if (!data) return { title: "Článek | Winio" };
-  const c = data as Clanky;
+  const c = data as Pick<Clanky, "titul" | "perex" | "typ" | "zdroj_url">;
+  const desc =
+    c.typ === "news" && c.zdroj_url
+      ? `${(c.perex ?? c.titul).slice(0, 130)}… Výňatek – celý text u zdroje.`
+      : (c.perex ?? c.titul).slice(0, 160);
   return {
     title: `${c.titul} | Články | Winio`,
-    description: (c.perex ?? c.titul).slice(0, 160),
+    description: desc.slice(0, 160),
   };
 }
 
@@ -63,6 +68,9 @@ export default async function ClanekDetailPage({ params }: Props) {
   }
 
   const hasCta = sazkovka || kasino;
+  const isKurzovanaNovinka =
+    c.typ === "news" && Boolean(c.zdroj_url?.trim());
+
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -70,6 +78,15 @@ export default async function ClanekDetailPage({ params }: Props) {
     description: (c.perex ?? c.titul).slice(0, 160),
     datePublished: c.published_at ?? undefined,
     url: `${BASE_URL}/clanky/${c.slug}`,
+    ...(isKurzovanaNovinka && c.zdroj_url
+      ? {
+          isBasedOn: {
+            "@type": "NewsArticle",
+            url: c.zdroj_url,
+            name: c.zdroj_nazev ?? "Původní článek",
+          },
+        }
+      : {}),
   };
   const publishedAt = c.published_at
     ? new Date(c.published_at).toLocaleDateString("cs-CZ", {
@@ -101,20 +118,77 @@ export default async function ClanekDetailPage({ params }: Props) {
         <p className="text-sm text-gray-500 mb-6">{publishedAt}</p>
       )}
 
-      {c.perex && (
-        <p className="text-gray-700 font-medium mb-6">{c.perex}</p>
+      {isKurzovanaNovinka && c.zdroj_url ? (
+        <>
+          <p className="text-xs font-medium uppercase tracking-wide text-gray-500 mb-2">
+            Krátký výňatek · plné znění u vydavatele
+          </p>
+          {c.perex ? (
+            <p className="text-gray-800 text-lg leading-relaxed mb-6 border-l-4 border-gray-200 pl-4">
+              {c.perex}
+            </p>
+          ) : (
+            <p className="text-gray-600 mb-6">
+              Celý článek najdete na stránkách uvedeného zdroje.
+            </p>
+          )}
+          <aside
+            className="rounded-lg border border-blue-200 bg-blue-50/80 p-5 mb-8"
+            aria-label="Odkaz na původní článek"
+          >
+            <p className="text-sm text-gray-800 mb-4">
+              Zobrazujeme jen krátký úvod z RSS. Úplné znění včetně případných
+              obrázků a souvisejících textů je výhradně u{" "}
+              <strong>{c.zdroj_nazev ?? "původního serveru"}</strong>.
+            </p>
+            <a
+              href={c.zdroj_url}
+              target="_blank"
+              rel="nofollow noopener noreferrer"
+              className="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-3 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Přečíst celý článek na {c.zdroj_nazev ?? "zdroji"} →
+            </a>
+            <p className="mt-3 text-xs text-gray-600">
+              <a
+                href={c.zdroj_url}
+                target="_blank"
+                rel="nofollow noopener noreferrer"
+                className="underline break-all"
+              >
+                {c.zdroj_url}
+              </a>
+            </p>
+          </aside>
+          {c.telo && (
+            <section className="mb-8" aria-label="Doplnění redakce">
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                Komentář / doplnění (Winio)
+              </h2>
+              <div
+                className="prose prose-gray max-w-none"
+                dangerouslySetInnerHTML={{ __html: c.telo }}
+              />
+            </section>
+          )}
+        </>
+      ) : (
+        <>
+          {c.perex && (
+            <p className="text-gray-700 font-medium mb-6">{c.perex}</p>
+          )}
+          {c.telo && (
+            <div
+              className="prose prose-gray max-w-none mb-8"
+              dangerouslySetInnerHTML={{ __html: c.telo }}
+            />
+          )}
+        </>
       )}
 
-      {c.telo && (
-        <div
-          className="prose prose-gray max-w-none mb-8"
-          dangerouslySetInnerHTML={{ __html: c.telo }}
-        />
-      )}
-
-      {!c.telo && c.perex && (
-        <p className="text-gray-700 mb-8">{c.perex}</p>
-      )}
+      <div className="my-6">
+        <BannerSlot pozice="clanek_bottom" />
+      </div>
 
       {hasCta && (
         <section className="border rounded-lg p-4 bg-gray-50" aria-labelledby="kde-vsadit">
