@@ -2,9 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Blok 18.1: jednotné CTA a responzivní kontejner */
 :root {
-  --color-cta-bg: theme("colors.gray.800");
-  --color-cta-hover: theme("colors.gray.700");
-  --color-cta-text: theme("colors.white");
+  --winio-cyan: #22d3ee;
+  --winio-navy: #0a0e1a;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-winio-navy text-slate-100;
+  }
+  ::selection {
+    @apply bg-cyan-500/30 text-white;
+  }
+}
+
+@layer utilities {
+  .bg-winio-hero {
+    background-color: #0a0e1a;
+    background-image: linear-gradient(
+        180deg,
+        rgba(8, 145, 178, 0.08) 0%,
+        transparent 45%
+      ),
+      linear-gradient(
+        rgba(34, 211, 238, 0.04) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        rgba(34, 211, 238, 0.04) 1px,
+        transparent 1px
+      );
+    background-size: 100% 100%, 56px 56px, 56px 56px;
+  }
+
+  .text-gradient-cyan {
+    @apply bg-gradient-to-r from-cyan-300 via-cyan-400 to-teal-400 bg-clip-text text-transparent;
+  }
+
+  @keyframes ticker {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+  .animate-ticker {
+    animation: ticker 45s linear infinite;
+  }
 }

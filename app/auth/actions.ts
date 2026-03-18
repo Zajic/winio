@@ -40,7 +40,13 @@ export async function signIn(formData: FormData): Promise<{ error?: string; redi
   try {
     const supabase = await createClient();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) return { error: error.message };
+    if (error) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes("invalid login credentials") || msg.includes("invalid_credentials")) {
+        return { error: "Nesprávný e-mail nebo heslo. Zkontrolujte údaje nebo se nejdřív zaregistrujte." };
+      }
+      return { error: error.message };
+    }
     const to = (formData.get("redirect") as string)?.trim();
     const redirectTo =
       to && to.startsWith("/") && !to.startsWith("//") ? to : "/ucet";

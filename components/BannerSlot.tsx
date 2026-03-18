@@ -27,7 +27,7 @@ export async function BannerSlot({ pozice, className = "" }: Props) {
               href={b.odkaz_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="block rounded-lg overflow-hidden border border-gray-200 hover:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="block overflow-hidden rounded-xl border border-winio-border focus:outline-none focus:ring-2 focus:ring-cyan-500/40"
             >
               <img
                 src={b.obrazek_url}
@@ -39,7 +39,7 @@ export async function BannerSlot({ pozice, className = "" }: Props) {
             <img
               src={b.obrazek_url}
               alt={b.nazev}
-              className="w-full h-auto object-cover rounded-lg border border-gray-200 max-h-32 sm:max-h-40"
+              className="w-full h-auto max-h-32 rounded-xl border border-winio-border object-cover sm:max-h-40"
             />
           )}
         </div>

@@ -26,17 +26,17 @@ export function CookieBar() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 border-t bg-white p-4 shadow-lg"
+      className="fixed bottom-0 left-0 right-0 z-50 border-t border-winio-border bg-winio-navy-light/95 p-4 shadow-[0_-8px_32px_rgba(0,0,0,0.4)] backdrop-blur-md"
       role="dialog"
       aria-label="Souhlas s cookies"
     >
       <div className="container mx-auto flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-sm">
+        <p className="text-sm text-slate-300">
           Používáme cookies pro fungování webu a s vaším souhlasem pro analýzu
           návštěvnosti. Detaily a možnost volby:{" "}
           <Link
             href="/ochrana-osobnich-udaju"
-            className="font-medium underline"
+            className="font-medium text-cyan-400 underline hover:text-cyan-300"
           >
             Ochrana osobních údajů
           </Link>
@@ -46,14 +46,14 @@ export function CookieBar() {
           <button
             type="button"
             onClick={() => save("accepted")}
-            className="rounded border border-gray-700 bg-gray-800 px-3 py-1.5 text-sm text-white hover:bg-gray-700"
+            className="rounded-lg bg-gradient-to-r from-cyan-500 to-teal-600 px-4 py-2 text-sm font-semibold text-winio-navy hover:opacity-95"
           >
             Souhlasím
           </button>
           <button
             type="button"
             onClick={() => save("rejected")}
-            className="rounded border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-winio-border px-4 py-2 text-sm text-slate-400 hover:bg-white/5 hover:text-white"
           >
             Odmítnout
           </button>

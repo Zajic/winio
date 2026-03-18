@@ -18,10 +18,11 @@ const SPORT_LABELS: Record<string, string> = {
   esport: "eSport",
 };
 
-type Props = { searchParams: Promise<{ sport?: string; den?: string }> };
+type Props = { searchParams: Promise<{ sport?: string; den?: string; q?: string }> };
 
 export default async function ZapasyPage({ searchParams }: Props) {
-  const { sport: sportFilter, den: denFilter } = await searchParams;
+  const { sport: sportFilter, den: denFilter, q: qRaw } = await searchParams;
+  const searchQ = qRaw?.trim().replace(/%/g, "").slice(0, 80) ?? "";
   const supabase = await createClient();
 
   let query = supabase
@@ -32,6 +33,12 @@ export default async function ZapasyPage({ searchParams }: Props) {
     .limit(100);
 
   if (sportFilter) query = query.eq("sport", sportFilter);
+  if (searchQ) {
+    const p = `%${searchQ}%`;
+    query = query.or(
+      `domaci_tym.ilike.${p},hoste_tym.ilike.${p},soutez.ilike.${p}`
+    );
+  }
 
   const { data: rows, error } = await query;
 
@@ -67,46 +74,63 @@ export default async function ZapasyPage({ searchParams }: Props) {
     });
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-semibold mb-2">Zápasy a kurzy</h1>
-      <p className="text-gray-600 mb-6">
-        Nadcházející zápasy. Klikněte na zápas pro srovnání kurzů a odkaz na
-        sázkovou kancelář.
-      </p>
+  function hrefZapasy(o: { sport?: string; den?: string; q?: string }) {
+    const p = new URLSearchParams();
+    if (o.sport) p.set("sport", o.sport);
+    if (o.den) p.set("den", o.den);
+    if (o.q) p.set("q", o.q);
+    const s = p.toString();
+    return s ? `/zapasy?${s}` : "/zapasy";
+  }
+  const qOpt = searchQ || undefined;
 
-      <div className="mb-6 flex flex-wrap gap-3">
-        <span className="text-sm text-gray-600">Den:</span>
+  return (
+    <div className="container mx-auto px-4 py-10">
+      <h1 className="font-display text-3xl font-bold text-white">Zápasy a kurzy</h1>
+      <p className="mt-2 max-w-2xl text-slate-400">
+        Nadcházející zápasy a srovnání kurzů u licencovaných sázkových kanceláří.
+      </p>
+      {searchQ && (
+        <p className="mt-2 text-sm text-cyan-400">
+          Hledání: „{searchQ}“ ·{" "}
+          <Link href="/zapasy" className="underline">
+            zrušit
+          </Link>
+        </p>
+      )}
+
+      <div className="mb-8 mt-6 flex flex-wrap items-center gap-2">
+        <span className="text-xs uppercase tracking-wider text-slate-500">Den</span>
         <Link
-          href={sportFilter ? `/zapasy?sport=${sportFilter}` : "/zapasy"}
-          className={`text-sm px-2 py-1 rounded ${!denFilter ? "bg-gray-200 font-medium" : "underline"}`}
+          href={hrefZapasy({ sport: sportFilter, q: qOpt })}
+          className={`rounded-lg px-3 py-1.5 text-sm ${!denFilter ? "bg-cyan-500/20 text-cyan-300" : "text-slate-400 hover:text-white"}`}
         >
           Vše
         </Link>
         <Link
-          href={`/zapasy?den=dnes${sportFilter ? `&sport=${sportFilter}` : ""}`}
-          className={`text-sm px-2 py-1 rounded ${denFilter === "dnes" ? "bg-gray-200 font-medium" : "underline"}`}
+          href={hrefZapasy({ den: "dnes", sport: sportFilter, q: qOpt })}
+          className={`rounded-lg px-3 py-1.5 text-sm ${denFilter === "dnes" ? "bg-cyan-500/20 text-cyan-300" : "text-slate-400 hover:text-white"}`}
         >
           Dnes
         </Link>
         <Link
-          href={`/zapasy?den=zitra${sportFilter ? `&sport=${sportFilter}` : ""}`}
-          className={`text-sm px-2 py-1 rounded ${denFilter === "zitra" ? "bg-gray-200 font-medium" : "underline"}`}
+          href={hrefZapasy({ den: "zitra", sport: sportFilter, q: qOpt })}
+          className={`rounded-lg px-3 py-1.5 text-sm ${denFilter === "zitra" ? "bg-cyan-500/20 text-cyan-300" : "text-slate-400 hover:text-white"}`}
         >
           Zítra
         </Link>
-        <span className="text-sm text-gray-600 ml-2">Sport:</span>
+        <span className="ml-3 text-xs uppercase tracking-wider text-slate-500">Sport</span>
         <Link
-          href={denFilter ? `/zapasy?den=${denFilter}` : "/zapasy"}
-          className={`text-sm px-2 py-1 rounded ${!sportFilter ? "bg-gray-200 font-medium" : "underline"}`}
+          href={hrefZapasy({ den: denFilter, q: qOpt })}
+          className={`rounded-lg px-3 py-1.5 text-sm ${!sportFilter ? "bg-cyan-500/20 text-cyan-300" : "text-slate-400 hover:text-white"}`}
         >
           Vše
         </Link>
         {(["fotbal", "hokej", "mma", "basketbal", "tenis", "esport"] as const).map((s) => (
           <Link
             key={s}
-            href={`/zapasy?sport=${s}${denFilter ? `&den=${denFilter}` : ""}`}
-            className={`text-sm px-2 py-1 rounded ${sportFilter === s ? "bg-gray-200 font-medium" : "underline"}`}
+            href={hrefZapasy({ sport: s, den: denFilter, q: qOpt })}
+            className={`rounded-lg px-3 py-1.5 text-sm ${sportFilter === s ? "bg-cyan-500/20 text-cyan-300" : "text-slate-400 hover:text-white"}`}
           >
             {SPORT_LABELS[s] ?? s}
           </Link>
@@ -115,9 +139,10 @@ export default async function ZapasyPage({ searchParams }: Props) {
 
       <ul className="space-y-3">
         {filtered.length === 0 ? (
-          <li className="text-gray-600">
-            Žádné zápasy. Spusťte cron načtení kurzů (api/cron/odds) nebo doplňte
-            ODDS_API_KEY.
+          <li className="rounded-xl border border-winio-border bg-winio-card/50 p-6 text-slate-400">
+            {searchQ
+              ? "Žádný zápas neodpovídá hledání."
+              : "Žádné zápasy. Spusťte cron kurzů nebo doplňte ODDS_API_KEY."}
           </li>
         ) : (
           filtered.map((z) => {
@@ -129,19 +154,16 @@ export default async function ZapasyPage({ searchParams }: Props) {
               minute: "2-digit",
             });
             return (
-              <li key={z.id} className="border rounded-lg p-4">
-                <Link
-                  href={`/zapasy/${z.id}`}
-                  className="block hover:bg-gray-50 -m-4 p-4 rounded-lg"
-                >
-                  <span className="text-xs text-gray-500">
+              <li key={z.id} className="rounded-xl border border-winio-border bg-winio-card/40 transition hover:border-cyan-500/30">
+                <Link href={`/zapasy/${z.id}`} className="block p-4">
+                  <span className="text-xs text-cyan-500/80">
                     {SPORT_LABELS[z.sport] ?? z.sport}
                     {z.soutez ? ` · ${z.soutez}` : ""}
                   </span>
-                  <p className="font-medium">
+                  <p className="mt-1 font-medium text-white">
                     {z.domaci_tym} – {z.hoste_tym}
                   </p>
-                  <p className="text-sm text-gray-600">{datumStr}</p>
+                  <p className="text-sm text-slate-500">{datumStr}</p>
                 </Link>
               </li>
             );

@@ -1,14 +1,32 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Outfit, Syne } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CookieBar } from "@/components/CookieBar";
 import { Analytics } from "@/components/Analytics";
 
+const outfit = Outfit({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+
+const syne = Syne({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-syne",
+  weight: ["600", "700", "800"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Winio – informace o sázkách a kurzech",
+  title: "Winio – kurzy, kasina a bonusy v ČR",
   description:
-    "Informační web o sázkách, kurzech a licencovaných sázkových kancelářích. Pouze informace, u nás nelze sázet ani hrát.",
+    "Největší přehled kurzů, licencovaných kasin a bonusů. Informační portál 18+. U nás nelze sázet – jen srovnání a odkazy na provozovatele.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0e1a",
 };
 
 export default function RootLayout({
@@ -17,8 +35,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="cs">
-      <body className="min-h-screen flex flex-col antialiased">
+    <html lang="cs" className={`${outfit.variable} ${syne.variable}`}>
+      <body className="min-h-screen flex flex-col antialiased font-sans bg-winio-navy text-slate-100">
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
